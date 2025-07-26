@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quantitative Investment Simulator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function switchInputMode(mode) {
+            document.getElementById('manualUploadSection').style.display = (mode === 'csv') ? 'block' : 'none';
+            document.getElementById('stockPickerSection').style.display = (mode === 'picker') ? 'block' : 'none';
+        }
+    </script>
+</head>
+<body class="bg-dark text-light" onload="switchInputMode('csv')">
+    <div class="container mt-4">
+        <header class="text-center mb-4">
+            <h1> Quantitative Multi-Factor Investment Simulator</h1>
+            <p class="lead">Analyze, cluster, and optimize investment portfolios.</p>
+        </header>
+
+        <form action="/simulate" method="post" enctype="multipart/form-data">
+            <div class="card bg-dark-2 border-secondary mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"> Input Method</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="input_mode" id="mode_csv" value="csv" checked onchange="switchInputMode('csv')">
+                        <label class="form-check-label" for="mode_csv">Upload Portfolio (CSV)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="input_mode" id="mode_picker" value="picker" onchange="switchInputMode('picker')">
+                        <label class="form-check-label" for="mode_picker">Select Sample Index</label>
+                    </div>
+
+                    <div id="manualUploadSection" class="mt-3">
+                        <label for="csv_file" class="form-label">Upload CSV File</label>
+                        <input class="form-control" type="file" id="csv_file" name="csv_file" accept=".csv">
+                        <div class="form-text">CSV must contain a 'Ticker' column. ESG columns are optional but enable ESG analysis.</div>
+                    </div>
+
+                    <div id="stockPickerSection" class="mt-3" style="display: none;">
+                         <div class="mb-3">
+                            <label for="stock_index" class="form-label">Select Sample Stock Index</label>
+                            <select class="form-select" id="stock_index" name="stock_index">
+                                {% for index in indices %}
+                                    <option value="{{ index }}">{{ index }}</option>
+                                {% endfor %}
+                            </select>
+                         </div>
+                         <div class="form-text">This mode uses a pre-defined list of sample stocks and performs financial analysis only (no ESG).</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-dark-2 border-secondary mb-4">
+                <div class="card-header"><h5 class="mb-0">⚙ User Options</h5></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>1. Clustering Method</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="clustering_method" id="cluster_manual" value="Manual" checked>
+                                <label class="form-check-label" for="cluster_manual">Manual (No Clustering)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="clustering_method" id="cluster_kmeans" value="KMeans">
+                                <label class="form-check-label" for="cluster_kmeans">Similar Grouping </label>
+                            </div>
+                             <div class="form-check">
+                                <input class="form-check-input" type="radio" name="clustering_method" id="cluster_gmm" value="GMM">
+                                <label class="form-check-label" for="cluster_gmm">Flexible Grouping </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>2. Optimization Strategy</h6>
+                             <div class="form-check">
+                                <input class="form-check-input" type="radio" name="optimization_strategy" id="opt_mpt" value="MPT" checked>
+                                <label class="form-check-label" for="opt_mpt">Mean-Variance</label>
+                            </div>
+                             <div class="form-check">
+                                <input class="form-check-input" type="radio" name="optimization_strategy" id="opt_hrp" value="HRP">
+                                <label class="form-check-label" for="opt_hrp">Hierarchical Risk Parity </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="optimization_strategy" id="opt_bl" value="Black-Litterman">
+                                <label class="form-check-label" for="opt_bl">Black-Litterman</label>
+                            </div>
+                             <div class="form-check">
+                                <input class="form-check-input" type="radio" name="optimization_strategy" id="opt_equal" value="EqualWeighting">
+                                <label class="form-check-label" for="opt_equal">Equal Weighting</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Run Simulation</button>
+            </div>
+        </form>
+    </div>
+
+    <footer class="text-center text-muted py-4">
+        <p>&copy; 2025 Quantitative Investment Simulator</p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
